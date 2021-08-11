@@ -13,16 +13,28 @@ class SearchRunner
   def self.process(arguments = [])
     # print out help manual
     unless (arguments & HELP_FLAGS).empty?
+      print_manual(type: 'cli')
+      return
+    end
+
+    # initiate STDIN to actively read user input
+    new(verbose: !(arguments & VERBOSE_FLAGS).empty?).run
+  end
+
+  # print out help manual based on the manual type
+  # type: string - a manual type for the actual search program or the CLI tool usage
+  def self.print_manual(type: 'search')
+    if type == 'cli'
       puts 'Usage: bin/search_cli [arguments]'
       puts 'no_arguments        Read user input from STDIN.'
       puts "#{HELP_FLAGS.join(', ')}          Display this help message."
       puts "#{VERBOSE_FLAGS.join(', ')}       Log debug message to standard output."
       puts 'Ctrl + D, quit      To exit the search program.'
-      return
+    else
+      puts 'Welcome to Zendesk Search!'
+      puts "Type 'quit' to exit at any time, press 'Enter' to continue\n\n"
+      CommandHandler.print_search_options
     end
-
-    # initiate STDIN to actively read user input
-    new(!(arguments & VERBOSE_FLAGS).empty?).run
   end
 
   # verbose: boolean - a flag to provdide more helping messages to STDOUT
@@ -32,8 +44,9 @@ class SearchRunner
 
   # run the search engine from STDIN
   def run
+    self.class.print_manual
     # execute each given command from STDIN
-    SearchIO.stdin { |command| CommandHandler.execute(command, @verbose) }
+    SearchIO.stdin { |command| CommandHandler.execute(command, verbose: @verbose) }
   rescue StandardError => e
     puts "[Running error]: #{e}"
   end
