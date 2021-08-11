@@ -1,0 +1,7 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# This is a CLI script to run the game
+Dir['./lib/*.rb'].sort.each { |file| require file }
+
+SearchRunner.process(ARGV)
