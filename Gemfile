@@ -12,3 +12,5 @@ gem 'rubocop-rspec', require: false
 gem 'pry', '~> 0.13.1'
 # code coverage check
 gem 'simplecov', require: false, group: :test
+# an efficient YAJL JSON parse library
+gem 'yajl-ruby', require: 'yajl'

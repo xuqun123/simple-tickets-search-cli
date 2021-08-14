@@ -6,7 +6,7 @@ class SearchRunner
   HELP_FLAGS = %w[-h --help].freeze
   VERBOSE_FLAGS = %w[-v --verbose].freeze
 
-  attr_reader :verbose
+  attr_reader :verbose, :search_engine
 
   # a processor to get the relevant actions based on a given arguments list
   # arguments: Array[string] - an arguments list getting from ARGV via CLI
@@ -17,8 +17,15 @@ class SearchRunner
       return
     end
 
+    preload_data
     # initiate STDIN to actively read user input
     new(verbose: !(arguments & VERBOSE_FLAGS).empty?).run
+  end
+
+  def self.preload_data
+    # pre-load users and tickets data into class variables
+    DataStore.insert_data('user', 'data/users.json')
+    DataStore.insert_data('ticket', 'data/tickets.json')
   end
 
   # print out help manual based on the manual type
@@ -40,13 +47,14 @@ class SearchRunner
   # verbose: boolean - a flag to provdide more helping messages to STDOUT
   def initialize(verbose: false)
     @verbose = verbose
+    @search_engine = SearchEngine.new
   end
 
   # run the search engine from STDIN
   def run
     self.class.print_manual
     # execute each given command from STDIN
-    SearchIO.stdin { |command| CommandHandler.execute(command, verbose: @verbose) }
+    SearchIO.stdin { |command| CommandHandler.execute(command, @search_engine, verbose: @verbose) }
   rescue StandardError => e
     puts "[Running error]: #{e}"
   end
