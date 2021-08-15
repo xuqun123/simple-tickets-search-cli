@@ -1,0 +1,14 @@
+---------------------------------
+Search Users with
+_id
+name
+created_at
+verified
+---------------------------------
+Search Tickets with
+_id
+created_at
+type
+subject
+assignee_id
+tags

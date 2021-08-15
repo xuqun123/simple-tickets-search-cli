@@ -7,7 +7,7 @@ module CommandHandler
     cmd = command.strip
 
     if cmd == 'quit'
-      exit(1)
+      Kernel.exit(1)
     elsif search_engine.conditions.level.nil? # perform level 1 actions if search level condition is not set
       case cmd
       when '1'
@@ -61,6 +61,22 @@ module CommandHandler
     # print out search options again if the command is not valid
     search_engine.reset
     print_search_options
+  end
+
+  # print out help manual based on the manual type
+  # type: string - a manual type for the actual search program or the CLI tool usage
+  def self.print_manual(type: 'search')
+    if type == 'cli'
+      puts 'Usage: bin/search_cli [arguments]'
+      puts 'no_arguments        Read user input from STDIN.'
+      puts "#{Search::Runner::HELP_FLAGS.join(', ')}          Display this help message."
+      puts "#{Search::Runner::VERBOSE_FLAGS.join(', ')}       Log debug message to standard output."
+      puts 'Ctrl + D, quit      To exit the search program.'
+    else
+      puts 'Welcome to Zendesk Search!'
+      puts "Type 'quit' to exit at any time, press 'Enter' to continue\n\n"
+      print_search_options
+    end
   end
 
   # print out the initial user prompt info

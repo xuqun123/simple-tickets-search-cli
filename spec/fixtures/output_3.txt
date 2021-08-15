@@ -1,0 +1,2 @@
+Searching tickets for type with a value of invalid_type:
+No results found

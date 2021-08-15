@@ -1,0 +1,8 @@
+Searching tickets for tags with a value of New Mexico, Şouth Carolina:
+_id               e34262a7-df37-4715-a482-fb0acb5d0b46
+created_at        2016-05-16T08:07:14-10:00
+type              incident
+subject           A Drama in Mongolia
+assignee_id       73
+tags              Şouth Carolina, Indiana, New Mexico, Nebraska
+assignee_name     Moran Daniels
