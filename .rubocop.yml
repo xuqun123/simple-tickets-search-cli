@@ -4,6 +4,6 @@ AllCops:
 Metrics/BlockLength:
   IgnoredMethods: ["describe", "context"]
 Metrics/MethodLength:
-  Max: 20
+  Max: 30
 Metrics/AbcSize:
   Max: 50

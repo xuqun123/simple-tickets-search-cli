@@ -1,16 +1,14 @@
 # frozen_string_literal: true
 
-require 'yajl'
-
 # A command handler to execute each user input command
 module CommandHandler
-  # execute a user input command
+  # process a user input command
   def self.execute(command, search_engine, verbose: false)
     cmd = command.strip
 
     if cmd == 'quit'
       exit(1)
-    elsif search_engine.conditions.level.nil?
+    elsif search_engine.conditions.level.nil? # perform level 1 actions if search level condition is not set
       case cmd
       when '1'
         puts 'Select 1) Users or 2) Tickets'
@@ -18,41 +16,54 @@ module CommandHandler
       when '2'
         list_searchable_fields
       else
-        puts "[LOG] The command is invalid: #{command}" if verbose
-        # print out search options again if the command is not valid
-        print_search_options
+        reset_search_engine(cmd, search_engine, verbose)
       end
-    elsif search_engine.conditions.level == 1
-      case cmd
-      when '1'
-        search_engine.conditions.option = 1
-        search_engine.conditions.level += 1
-        puts 'Enter Search term'
-      when '2'
-        search_engine.conditions.option = 2
+    else
+      # operate on search engine if search level condition is set
+      operate_searh_engine(cmd, search_engine, verbose)
+    end
+  end
+
+  # manipulate search conditions and exectue search engine if necessary
+  def self.operate_searh_engine(command, search_engine, verbose)
+    case search_engine.conditions.level
+    when 1
+      case command
+      when '1', '2'
+        search_engine.conditions.option = command.to_i
         search_engine.conditions.level += 1
         puts 'Enter Search term'
       else
-        puts "[LOG] The command is invalid: #{command}" if verbose
-        # print out search options again if the command is not valid
-        search_engine.reset
-        print_search_options
+        reset_search_engine(command, search_engine, verbose)
       end
-    elsif search_engine.conditions.level == 2
-      search_engine.conditions.term = cmd
+    when 2
+      search_engine.conditions.term = command
       search_engine.conditions.level += 1
       puts 'Enter Search value'
-    elsif search_engine.conditions.level == 3
-      search_engine.conditions.value = cmd
+    when 3
+      search_engine.conditions.value = command
+      if verbose
+        puts '[LOG] The search condtions are: '
+        search_engine.conditions.print
+      end
 
-      puts "[LOG] The search condtions are: #{search_engine.conditions.print}" if verbose
+      puts "Searching #{search_engine.conditions.option} for #{search_engine.conditions.term}" \
+           " with a value of #{search_engine.conditions.value}:"
 
-      puts "Searching #{search_engine.conditions.option} for #{search_engine.conditions.term} with a value of #{search_engine.conditions.value}:"
-
+      # invoke search engine to run the search
       search_engine.execute
     end
   end
 
+  # reset the status of search engine
+  def self.reset_search_engine(command, search_engine, verbose)
+    puts "[LOG] The command is invalid: #{command}" if verbose
+    # print out search options again if the command is not valid
+    search_engine.reset
+    print_search_options
+  end
+
+  # print out the initial user prompt info
   def self.print_search_options
     puts 'Select Search options:'
     puts ' * Press 1 to search Zendesk'
@@ -60,17 +71,13 @@ module CommandHandler
     puts " * Type 'quit' to exit the program\n\n"
   end
 
+  # display all search fields for users and tickets data
   def self.list_searchable_fields
     puts '---------------------------------'
     puts 'Search Users with'
-    puts DataStore.get_user_fields
+    puts DataStore.instance.user_fields
     puts '---------------------------------'
     puts 'Search Tickets with'
-    puts DataStore.get_ticket_fields
-  end
-
-  def self.get_json_data(filename)
-    json = File.new(filename, 'r')
-    hash = Yajl::Parser.new.parse(json)
+    puts DataStore.instance.ticket_fields
   end
 end

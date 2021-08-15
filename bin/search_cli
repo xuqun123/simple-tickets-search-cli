@@ -4,6 +4,6 @@
 # This is a CLI script to run the search system
 require 'pry'
 
-Dir['./lib/*.rb'].sort.each { |file| require file }
+Dir['./lib/*.rb', './lib/*/*.rb'].sort.each { |file| require file }
 
-SearchRunner.process(ARGV)
+Search::Runner.process(ARGV)
